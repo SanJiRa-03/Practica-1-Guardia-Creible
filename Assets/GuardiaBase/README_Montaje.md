@@ -247,7 +247,7 @@ Y en la decisión:
 
 ## 7. Antes de entregar
 
-- [ ] Compila sin errores **ni warnings** al abrir el proyecto en limpio
+- [ ] Compila sin errores **ni warnings** al abrir el proyecto es limpio
 - [ ] Las tres etapas de visión implementadas, con *raycast* a **varios puntos**
 - [ ] Medidor con **≥3 factores**, decaimiento asimétrico y umbrales con histéresis
 - [ ] Los **cuatro estados** de la FSM y las **cuatro ramas** del árbol
