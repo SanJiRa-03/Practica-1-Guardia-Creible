@@ -1844,7 +1844,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 819659237c419474482af93a29aae836, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UDIT.IA3.Guardia.GuardiaAgente
-  Cerebro: 0
+  Cerebro: 1
   FrecuenciaDecision: 10
   MostrarTraza: 1
 --- !u!114 &1151612864
@@ -2231,7 +2231,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 819659237c419474482af93a29aae836, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UDIT.IA3.Guardia.GuardiaAgente
-  Cerebro: 0
+  Cerebro: 1
   FrecuenciaDecision: 10
   MostrarTraza: 1
 --- !u!114 &1332397698

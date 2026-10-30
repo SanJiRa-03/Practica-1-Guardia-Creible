@@ -79,8 +79,9 @@ namespace UDIT.IA3.Guardia
 
         private void Awake()
         {
+            //Se "guarda" el gameobject que representa los ojos en la variable "Ojos" con su transform, de esta manera podemos acceder a todos sus parámetros cuando sea necesario.
             if (Ojos == null) Ojos = transform;
-
+            //Si no hay objetivo guardado,e s decir, si está vacío, se busca por el tag:
             if (Objetivo == null && !string.IsNullOrEmpty(TagObjetivo))
             {
                 GameObject go = GameObject.FindGameObjectWithTag(TagObjetivo);
@@ -134,21 +135,30 @@ namespace UDIT.IA3.Guardia
         {
             // ETAPA 1 · ALCANCE ✅
             // Comparamos distancias al cuadrado para ahorrarnos la raíz.
-            Vector3 haciaObjetivo = Objetivo.position - Ojos.position;
+            Vector3 haciaObjetivo = Objetivo.position - Ojos.position;            
 
             if (haciaObjetivo.sqrMagnitude > Alcance * Alcance) return false;
 
-            // ETAPA 2 · ÁNGULO ❌ TODO
-            //
+            // ETAPA 2 · ÁNGULO ✅         
             // Comprobad que el objetivo cae dentro del cono de AnguloVision
             // grados alrededor de Ojos.forward.
-            //
-            // Pista: Vector3.Angle(Ojos.forward, haciaObjetivo) <= AnguloVision * 0.5f
-            // Cuidado con el 0.5: AnguloVision es el cono COMPLETO.
-            // Y cuidado con la componente Y si vuestro suelo no es plano.
 
-            // ETAPA 3 · OCLUSIÓN ❌ TODO
-            //
+            //Con esto, evitamos que si el jugador tiene una Y diferente, al saltar o incluso al estar en un piso superior, esto evita que el vector haciaObjetivo apunte en direcciones que no debe.
+            //1. Aplastamos la dirección al jugador:
+            Vector3 direccionJugador = new Vector3(haciaObjetivo.x , 0f, haciaObjetivo.z);
+            //2. Aplastamos la dirección al guardia:
+            Vector3 direccionGuardia = new Vector3(Ojos.forward.x, 0f, Ojos.forward.z);
+
+            //Explicación: Si el ángulo definido por el eje Z y haciaObjetivo (variable Vector 3 que calcula hacia dónde debe ir el guardia) es menor o igual que el total del ángulo de visión [terminar de completar]
+            if (Vector3.Angle(direccionGuardia, direccionJugador) >= AnguloVision * 0.5f)
+            {
+                Debug.Log("No te veo");
+                return false; //El guardia NO ve al jugador, no está en el campo de visión.
+            }
+
+            Debug.Log("Te veo");
+
+            // ETAPA 3 · OCLUSIÓN ❌ TODO            
             // Lanzad un Physics.Raycast desde Ojos.position hacia VARIOS puntos
             // del objetivo, no solo hacia su centro. Con tres basta: cabeza
             // (+1.6f en Y), torso (+0.9f) y pies (+0.1f) si el pivote está en
@@ -163,7 +173,15 @@ namespace UDIT.IA3.Guardia
             //   Physics.Raycast(Ojos.position, dir.normalized, dist, CapasQueOcluyen)
             //   devuelve TRUE si ha chocado, es decir, si NO se ve.
 
-            return true;   // ← mientras no hagáis las etapas 2 y 3, ve a través de las paredes
+            /*if (Physics.Raycast(Ojos.position, dir.normalized, dist, CapasQueOcluyen))
+            {
+                Debug.Log("No te veo.");
+                return true;
+            }
+            Debug.Log("Te veo");
+            return false;*/
+
+            return true;   // El guardia SÍ ve al jugador, está en el campo de visión ← mientras no hagáis las etapas 2 y 3, ve a través de las paredes
         }
 
         // ───────────────────────────────────────────────────────────────────
