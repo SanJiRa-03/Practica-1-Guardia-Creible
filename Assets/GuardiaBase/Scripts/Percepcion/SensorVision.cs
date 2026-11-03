@@ -15,8 +15,8 @@
 //  enunciado es convertir esto en un sensor que se pueda defender:
 //
 //     ETAPA 1  alcance   ✅ hecho (es lo único que hay)
-//     ETAPA 2  ángulo    ❌ TODO
-//     ETAPA 3  oclusión  ❌ TODO   ← y con VARIOS puntos, no solo el centro
+//     ETAPA 2  ángulo    ✅ hecho
+//     ETAPA 3  oclusión  ✅ hecho   ← y con VARIOS puntos, no solo el centro
 //     MEDIDOR  sospecha  ❌ TODO   ← 3 factores, decaimiento, histéresis
 //
 //  Filtrar barato antes de filtrar caro (sesión 4): el orden de las tres
@@ -25,8 +25,9 @@
 //  «funciona» y cuesta veinte veces más.
 // ═══════════════════════════════════════════════════════════════════════════
 
-using UnityEngine;
+using System.Drawing;
 using UDIT.IA3.BT;
+using UnityEngine;
 
 namespace UDIT.IA3.Guardia
 {
@@ -40,6 +41,8 @@ namespace UDIT.IA3.Guardia
         [Header("Cono de visión")]
         public float Alcance = 15f;
         [Range(0f, 180f)] public float AnguloVision = 60f;
+        public float[] desplazamientos = { 0.8f, 0f, -0.9f }; //Alturas de cabeza, torso y pies
+        int contarPuntosVisibles = 0;
 
         [Tooltip("Desde dónde se mira. Si está vacío se usa el propio transform. " +
                  "Poned aquí la cabeza: mirar desde los pies da resultados raros.")]
@@ -130,7 +133,6 @@ namespace UDIT.IA3.Guardia
         // ───────────────────────────────────────────────────────────────────
         //  LAS TRES ETAPAS
         // ───────────────────────────────────────────────────────────────────
-
         private bool ComprobarVision()
         {
             // ETAPA 1 · ALCANCE ✅
@@ -140,9 +142,7 @@ namespace UDIT.IA3.Guardia
             if (haciaObjetivo.sqrMagnitude > Alcance * Alcance) return false;
 
             // ETAPA 2 · ÁNGULO ✅         
-            // Comprobad que el objetivo cae dentro del cono de AnguloVision
-            // grados alrededor de Ojos.forward.
-
+            // Comprobad que el objetivo cae dentro del cono de AnguloVision grados alrededor de Ojos.forward.
             //Con esto, evitamos que si el jugador tiene una Y diferente, al saltar o incluso al estar en un piso superior, esto evita que el vector haciaObjetivo apunte en direcciones que no debe.
             //1. Aplastamos la dirección al jugador:
             Vector3 direccionJugador = new Vector3(haciaObjetivo.x , 0f, haciaObjetivo.z);
@@ -152,36 +152,52 @@ namespace UDIT.IA3.Guardia
             //Explicación: Si el ángulo definido por el eje Z y haciaObjetivo (variable Vector 3 que calcula hacia dónde debe ir el guardia) es menor o igual que el total del ángulo de visión [terminar de completar]
             if (Vector3.Angle(direccionGuardia, direccionJugador) >= AnguloVision * 0.5f)
             {
-                Debug.Log("No te veo");
+                //Debug.Log("No te veo");
                 return false; //El guardia NO ve al jugador, no está en el campo de visión.
             }
 
-            Debug.Log("Te veo");
+            //Debug.Log("Te veo");
 
-            // ETAPA 3 · OCLUSIÓN ❌ TODO            
+            // ETAPA 3 · OCLUSIÓN ✅           
             // Lanzad un Physics.Raycast desde Ojos.position hacia VARIOS puntos
             // del objetivo, no solo hacia su centro. Con tres basta: cabeza
             // (+1.6f en Y), torso (+0.9f) y pies (+0.1f) si el pivote está en
             // los pies. La cápsula de Unity lo tiene en el CENTRO: con ella son
             // +0.8f, 0f y -0.9f (README_Montaje, 3.3).
-            //
+
+            //Ponemos el contador de puntos visibles a 0:
+            contarPuntosVisibles = 0;
+
+            foreach (float desplazamientoY in desplazamientos)
+            {
+                Vector3 haciaPunto = haciaObjetivo + new Vector3(0f, desplazamientoY, 0f);
+                float distancia = haciaPunto.magnitude;
+                Vector3 direccion = haciaPunto.normalized;
+
+                //Lanzamos un rayo desde los ojos, hacia el jugador, y si choca con algo que esté en las capas que ocluyen, significa que no lo ve.
+                if (!Physics.Raycast(Ojos.position, direccion, distancia, CapasQueOcluyen))
+                {
+                    contarPuntosVisibles++;
+                    Debug.DrawLine(Ojos.position, haciaPunto, UnityEngine.Color.red);
+                }
+
+                Debug.DrawLine(Ojos.position, haciaPunto, UnityEngine.Color.green);
+            }
+
             // Si CUALQUIERA de los tres llega sin chocar contra CapasQueOcluyen,
             // el objetivo es visible. Devolved además cuántos han llegado: es
             // un factor estupendo para el medidor (ver «visibilidad parcial»).
             //
             // Pista:
             //   Physics.Raycast(Ojos.position, dir.normalized, dist, CapasQueOcluyen)
-            //   devuelve TRUE si ha chocado, es decir, si NO se ve.
+            //   devuelve TRUE si ha chocado, es decir, si NO se ve.                        
 
-            /*if (Physics.Raycast(Ojos.position, dir.normalized, dist, CapasQueOcluyen))
+            if (contarPuntosVisibles > 0)
             {
-                Debug.Log("No te veo.");
-                return true;
-            }
-            Debug.Log("Te veo");
-            return false;*/
+                return true;   // El guardia SÍ ve al jugador, está en el campo de visión ← mientras no hagáis las etapas 2 y 3, ve a través de las paredes
+            }            
 
-            return true;   // El guardia SÍ ve al jugador, está en el campo de visión ← mientras no hagáis las etapas 2 y 3, ve a través de las paredes
+            return false;
         }
 
         // ───────────────────────────────────────────────────────────────────

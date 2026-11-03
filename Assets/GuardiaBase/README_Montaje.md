@@ -215,7 +215,7 @@ vuestros propios ojos antes de arreglarlo. Vuestro trabajo:
 | Etapa | Estado | Dónde |
 |---|---|---|
 | 1 · Alcance | ✅ hecho | `ComprobarVision()` |
-| 2 · Ángulo | ❌ **TODO** | `ComprobarVision()` |
+| 2 · Ángulo | ✅ hecho | `ComprobarVision()` |
 | 3 · Oclusión con varios puntos | ❌ **TODO** | `ComprobarVision()` |
 | Medidor de sospecha (3 factores, decaimiento) | ❌ **TODO** | `ActualizarSospecha()` |
 | Umbrales con histéresis | ✅ hecho, os lo doy | `ActualizarNivel()` |
