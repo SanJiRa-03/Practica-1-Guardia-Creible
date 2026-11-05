@@ -2173,7 +2173,7 @@ MonoBehaviour:
   VelocidadSubida: 0.8
   VelocidadBajada: 0.08
   UmbralSospecha: 0.35
-  UmbralAlerta: 0.8
+  UmbralAlerta: 0.95
   Histeresis: 0.1
 --- !u!114 &1151612866
 MonoBehaviour:
@@ -2218,7 +2218,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 2
+  m_Speed: 0
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 240
@@ -2463,7 +2463,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 2
+  m_Speed: 0
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 240
@@ -2525,7 +2525,7 @@ MonoBehaviour:
   VelocidadSubida: 0.8
   VelocidadBajada: 0.08
   UmbralSospecha: 0.35
-  UmbralAlerta: 0.8
+  UmbralAlerta: 0.95
   Histeresis: 0.1
 --- !u!4 &1332397695 stripped
 Transform:

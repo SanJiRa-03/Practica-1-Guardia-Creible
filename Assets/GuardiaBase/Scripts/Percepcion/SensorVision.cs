@@ -25,8 +25,8 @@
 //  «funciona» y cuesta veinte veces más.
 // ═══════════════════════════════════════════════════════════════════════════
 
-using System.Drawing;
 using UDIT.IA3.BT;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace UDIT.IA3.Guardia
@@ -74,6 +74,9 @@ namespace UDIT.IA3.Guardia
         private float _sospecha;
         private NivelSospecha _nivel = NivelSospecha.Tranquilo;
         private bool _visiblePrevio;
+        //Para el medidor de sospecha, vamos a calcular tres factores que nos den la evidencia de que el jugador es visible. Estos factores se calculan en ComprobarVision() y se usan en ActualizarSospecha().
+        float factorDistancia = 0f;
+        float factorAngulo = 0f;
 
         /// <summary>Solo para los gizmos: si la última comprobación dio positivo.</summary>
         public bool VisibleAhora { get; private set; }
@@ -95,7 +98,6 @@ namespace UDIT.IA3.Guardia
         // ───────────────────────────────────────────────────────────────────
         //  EL CICLO DE PERCEPCIÓN
         // ───────────────────────────────────────────────────────────────────
-
         public void Percibir(Blackboard bb)
         {
             if (Objetivo == null) return;
@@ -141,6 +143,8 @@ namespace UDIT.IA3.Guardia
 
             if (haciaObjetivo.sqrMagnitude > Alcance * Alcance) return false;
 
+            factorDistancia = 1f - (haciaObjetivo.magnitude / Alcance); //Factor de evidencia por distancia: más cerca, más evidencia.
+
             // ETAPA 2 · ÁNGULO ✅         
             // Comprobad que el objetivo cae dentro del cono de AnguloVision grados alrededor de Ojos.forward.
             //Con esto, evitamos que si el jugador tiene una Y diferente, al saltar o incluso al estar en un piso superior, esto evita que el vector haciaObjetivo apunte en direcciones que no debe.
@@ -150,7 +154,8 @@ namespace UDIT.IA3.Guardia
             Vector3 direccionGuardia = new Vector3(Ojos.forward.x, 0f, Ojos.forward.z);
 
             //Explicación: Si el ángulo definido por el eje Z y haciaObjetivo (variable Vector 3 que calcula hacia dónde debe ir el guardia) es menor o igual que el total del ángulo de visión [terminar de completar]
-            if (Vector3.Angle(direccionGuardia, direccionJugador) >= AnguloVision * 0.5f)
+            factorAngulo = 1f - (Vector3.Angle(direccionGuardia, direccionJugador) / (AnguloVision * 0.5f));
+            if (factorAngulo < 0)
             {
                 //Debug.Log("No te veo");
                 return false; //El guardia NO ve al jugador, no está en el campo de visión.
@@ -178,16 +183,17 @@ namespace UDIT.IA3.Guardia
                 if (!Physics.Raycast(Ojos.position, direccion, distancia, CapasQueOcluyen))
                 {
                     contarPuntosVisibles++;
-                    Debug.DrawLine(Ojos.position, haciaPunto, UnityEngine.Color.red);
+                    Debug.DrawLine(Ojos.position, Ojos.position + haciaPunto, Color.green);
                 }
-
-                Debug.DrawLine(Ojos.position, haciaPunto, UnityEngine.Color.green);
+                else
+                {
+                    Debug.DrawLine(Ojos.position, Ojos.position + haciaPunto, Color.red);                    
+                }
             }
 
             // Si CUALQUIERA de los tres llega sin chocar contra CapasQueOcluyen,
             // el objetivo es visible. Devolved además cuántos han llegado: es
-            // un factor estupendo para el medidor (ver «visibilidad parcial»).
-            //
+            // un factor estupendo para el medidor (ver «visibilidad parcial»).            
             // Pista:
             //   Physics.Raycast(Ojos.position, dir.normalized, dist, CapasQueOcluyen)
             //   devuelve TRUE si ha chocado, es decir, si NO se ve.                        
@@ -203,7 +209,6 @@ namespace UDIT.IA3.Guardia
         // ───────────────────────────────────────────────────────────────────
         //  EL MEDIDOR DE SOSPECHA
         // ───────────────────────────────────────────────────────────────────
-
         private void ActualizarSospecha(bool visible, float dt)
         {
             // TODO · APARTADO A.2 y A.3 del enunciado
@@ -225,6 +230,10 @@ namespace UDIT.IA3.Guardia
             //     mismo (sesión 4, «Producto o suma» de B2.1b): con el producto, un solo
             //     factor a cero anula la detección; con la media, no. Es una
             //     decisión de diseño y hay que justificarla en la memoria.
+
+            float factorDeRayos = contarPuntosVisibles / 3f; //Factor de evidencia por rayos: más rayos visibles, más evidencia.                              
+            float factorEvidencia = factorDistancia * ((factorAngulo + factorDeRayos) / 2f); //Factor de evidencia total: combinamos los tres factores (distancia, ángulo y rayos) para obtener un valor entre 0 y 1. La distancia tiene más peso que los otros dos factores, que se promedian.
+
             //
             //  2) Subir:  _sospecha += evidencia * VelocidadSubida * dt
             //     Bajar:  _sospecha -= VelocidadBajada * dt
@@ -234,8 +243,19 @@ namespace UDIT.IA3.Guardia
             //
             //  3) Cruzar umbrales CON HISTÉRESIS (método de abajo).
 
-            _sospecha = visible ? 1f : 0f;          // ← interruptor. Sustituidlo.
+            //Si el guardia ve al jugador:
+            if (visible)
+            {
+                _sospecha += factorEvidencia * VelocidadSubida * dt; //Sube la sospecha según la evidencia y la velocidad de subida.
+            }
+            else
+            {
+                _sospecha -= VelocidadBajada * dt; //Baja la sospecha según la velocidad de bajada.
+            }
 
+            //_sospecha = visible ? 1f : 0f; // ← interruptor. Sustituidlo.
+
+            _sospecha = Mathf.Clamp(_sospecha, 0f, 1f); //Clamp de 0 a 1.
             _nivel = ActualizarNivel(_sospecha, _nivel);
         }
 
@@ -266,6 +286,7 @@ namespace UDIT.IA3.Guardia
                     if (s < UmbralAlerta - Histeresis) return NivelSospecha.Sospecha;
                     break;
             }
+
             return actual;
         }
     }
