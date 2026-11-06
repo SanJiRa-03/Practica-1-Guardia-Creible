@@ -17,7 +17,7 @@
 //     ETAPA 1  alcance   ✅ hecho (es lo único que hay)
 //     ETAPA 2  ángulo    ✅ hecho
 //     ETAPA 3  oclusión  ✅ hecho   ← y con VARIOS puntos, no solo el centro
-//     MEDIDOR  sospecha  ❌ TODO   ← 3 factores, decaimiento, histéresis
+//     MEDIDOR  sospecha  ✅ hecho  ← 3 factores, decaimiento, histéresis
 //
 //  Filtrar barato antes de filtrar caro (sesión 4): el orden de las tres
 //  etapas no es casual. La comprobación de distancia es un producto escalar;

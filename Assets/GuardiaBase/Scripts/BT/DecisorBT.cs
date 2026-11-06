@@ -20,6 +20,7 @@
 
 using UnityEngine;
 using UDIT.IA3.BT;
+using Unity.VisualScripting;
 
 namespace UDIT.IA3.Guardia
 {
@@ -85,36 +86,84 @@ namespace UDIT.IA3.Guardia
 
             return new ActiveSelector("Guardia",
 
-                // ── TODO · rama de ALERTA (perseguir) ───────────────────────
-                // new Monitor("SiAlerta",
-                //     new Condition("¿Alerta?", bb =>
-                //         bb.Get(ClavesBB.Nivel, NivelSospecha.Tranquilo) == NivelSospecha.Alerta),
-                //     new IrA(...)),
-
-                // ── TODO · rama de SOSPECHA (investigar) ────────────────────
-
-                // ── TODO · rama de BÚSQUEDA (última posición conocida) ──────
-
-                // ── Rama de PATRULLA — ejemplo de nodo hoja enchufado ───────
-                new ActionNode("Patrullar", bb =>
-                {
-                    RutaPatrulla ruta = _agente.GetComponent<RutaPatrulla>();
-                    if (ruta == null || !ruta.TieneRuta) return Status.Failure;
-
-                    // Si ya llegué al punto anterior, pido el siguiente.
-                    if (bb.Get(ClavesBB.HaLlegado, false))
+                // ── ✅ hecho · rama de ALERTA (perseguir) ───────────────────────
+                new Monitor("SiAlerta",
+                    new Condition("¿Alerta?", bb => bb.Get(ClavesBB.Nivel, NivelSospecha.Tranquilo) == NivelSospecha.Alerta),
+                    new ActionNode("Perseguir", bb =>
                     {
-                        bb.Set(ClavesBB.Destino, ruta.Avanzar());
+                        bb.Set(ClavesBB.Destino, bb.Get(ClavesBB.UltimaPos, Vector3.zero));
                         bb.Set(ClavesBB.TieneDestino, true);
-                    }
 
-                    // Patrullar no «termina» nunca: es una acción de fondo.
-                    // Por eso devuelve Running y no Success. Si devolviera
-                    // Success, el ActiveSelector la daría por hecha y el árbol
-                    // se quedaría sin nada que hacer.
-                    return Status.Running;
-                })
+                        return Status.Running;
+                    }
+                    )),
+
+                    // ── ✅ hecho· rama de SOSPECHA (investigar) ────────────────────
+                    new Monitor("SiSospecha",
+                    new Condition("¿Sospecha?", bb => bb.Get(ClavesBB.Nivel, NivelSospecha.Tranquilo) == NivelSospecha.Sospecha),
+                    new IrA("Ir a última posición", ClavesBB.UltimaPos)),
+
+                    // ── TODO · rama de BÚSQUEDA (última posición conocida) ──────
+                    /*new Monitor("SiSospecha",
+                    new Condition("¿Sospecha?", bb => bb.Get(ClavesBB.Nivel, NivelSospecha.Tranquilo) == NivelSospecha.Sospecha),
+                    new ActionNode("Perseguir", bb =>
+                    {
+
+                    }
+                    )),*/
+                    // ── Rama de PATRULLA — ejemplo de nodo hoja enchufado ───────
+                    new ActionNode("Patrullar", bb =>
+                    {
+                        RutaPatrulla ruta = _agente.GetComponent<RutaPatrulla>();
+                        if (ruta == null || !ruta.TieneRuta) return Status.Failure;
+
+                        // Si ya llegué al punto anterior, pido el siguiente.
+                        if (bb.Get(ClavesBB.HaLlegado, false))
+                        {
+                            bb.Set(ClavesBB.Destino, ruta.Avanzar());
+                            bb.Set(ClavesBB.TieneDestino, true);
+                        }
+
+                        // Patrullar no «termina» nunca: es una acción de fondo.
+                        // Por eso devuelve Running y no Success. Si devolviera
+                        // Success, el ActiveSelector la daría por hecha y el árbol
+                        // se quedaría sin nada que hacer.
+                        return Status.Running;
+                    })
             );
+        }
+    }
+
+    //Creamos un nodo hoja que nos permite ir a un destino y esperar a que llegue.
+    public sealed class IrA: Node
+    {
+        //La clave del blackboard donde está el destino.
+        private readonly string clave;
+        //El constructor recibe el nombre del nodo y la clave del blackboard.
+        public IrA(string nombre, string clave) : base(nombre)
+        {
+            this.clave = clave;
+        }
+
+        protected override void OnInitialize(Blackboard bb)
+        {        
+            //Cogemos lo que haya en clave, si no hay nada, usamos el punto (0,0,0). Y luego lo guardamos en Destino.
+            bb.Set(ClavesBB.Destino, bb.Get(clave, Vector3.zero));
+            //Cuando se inicializa el nodo, ponemos el destino en el blackboard.
+            bb.Set(ClavesBB.TieneDestino, true);
+            //Borra el "ya llegué" de la vez anterior para que el Update siga funcionando.
+            bb.Set(ClavesBB.HaLlegado, false);
+        }
+        protected override Status Update(Blackboard bb)
+        {
+            if (bb.Get(ClavesBB.HaLlegado, false))
+            {
+                return Status.Success;
+            }
+            else
+            {
+                return Status.Running;
+            }
         }
     }
 }
