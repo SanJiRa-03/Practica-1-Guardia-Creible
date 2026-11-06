@@ -102,7 +102,7 @@ namespace UDIT.IA3.Guardia
                     new Condition("¿Sospecha?", bb => bb.Get(ClavesBB.Nivel, NivelSospecha.Tranquilo) == NivelSospecha.Sospecha),
                     new IrA("Ir a última posición", ClavesBB.UltimaPos)),
 
-                    // ── TODO · rama de BÚSQUEDA (última posición conocida) ──────
+                    // ── ✅ hecho · rama de BÚSQUEDA (última posición conocida) ──────
                     new Sequence("SiÚltimaPos",
                     new Condition("¿Tiene última posición?", bb => bb.Get(ClavesBB.TieneUltimaPos, false)),
                     new IrA("Ir a última posición", ClavesBB.UltimaPos),
@@ -167,20 +167,49 @@ namespace UDIT.IA3.Guardia
     public sealed class MirarAlrededor : Node
     {
         private float horaInicio;
-        private float tiempoMaximo = 3f; //Tiempo máximo para mirar alrededor
+        private float horaLlegada;
+
+        private float tiempoMaximo = 12f; //Tiempo máximo para mirar alrededor, (se le da tiempo para revisar todos los puntos).
+        private float tiempoDeEspera; //Tiempo de espera en cada punto.
+        private float radioBusqueda = 4f; //Radio de búsqueda.
         public MirarAlrededor(string nombre) : base(nombre)
         {
         }
         protected override void OnInitialize(Blackboard bb)
         {
             horaInicio = bb.Tiempo; //Guarda la hora de inicio
+            horaLlegada = -1f; //Inicializa la hora de llegada a -1 para indicar que todavía no.
+            tiempoDeEspera = Random.Range(1f, 3f);
         }
         protected override Status Update(Blackboard bb)
         {
             if (bb.Tiempo - horaInicio >= tiempoMaximo)
             {
-                bb.Set(ClavesBB.TieneUltimaPos, false); //Borra la última posición conocida
+                bb.Set(ClavesBB.TieneUltimaPos, false); //Borra la última posición conocida.
                 return Status.Success; //Ha terminado de mirar alrededor
+            }
+            else if (bb.Get(ClavesBB.HaLlegado, false))
+            {
+                if (horaLlegada < 0f)
+                {
+                    horaLlegada = bb.Tiempo; //Guarda la hora de llegada para empezar a contar el tiempo de espera.
+                }
+                else if (bb.Tiempo - horaLlegada >= tiempoDeEspera)
+                {
+                    Vector2 puntoAleatorio2D = Random.insideUnitCircle * radioBusqueda; //Genera un punto aleatorio dentro de un círculo unitario 
+                    Vector3 puntoAleatorio3D = new Vector3(puntoAleatorio2D.x, 0f, puntoAleatorio2D.y); //Convierte el punto 2D en 3D, la y del círculo pasa a ser la z del mundo.
+
+                    Vector3 nuevaPosicion = bb.Get(ClavesBB.UltimaPos, Vector3.zero) + puntoAleatorio3D; //Suma el punto aleatorio a la última posición conocida.
+
+                    bb.Set(ClavesBB.Destino, nuevaPosicion);
+                    bb.Set(ClavesBB.TieneDestino, true);
+                    bb.Set(ClavesBB.HaLlegado, false);
+
+                    horaLlegada = -1f; //Reinicia la hora de llegada para que vuelva a esperar en el siguiente punto.
+                    tiempoDeEspera = Random.Range(1f, 3f);
+                }
+
+                return Status.Running; //Sigue mirando alrededor.
             }
             else
             {
