@@ -20,7 +20,6 @@
 
 using UnityEngine;
 using UDIT.IA3.BT;
-using Unity.VisualScripting;
 
 namespace UDIT.IA3.Guardia
 {
@@ -104,13 +103,11 @@ namespace UDIT.IA3.Guardia
                     new IrA("Ir a última posición", ClavesBB.UltimaPos)),
 
                     // ── TODO · rama de BÚSQUEDA (última posición conocida) ──────
-                    /*new Monitor("SiSospecha",
-                    new Condition("¿Sospecha?", bb => bb.Get(ClavesBB.Nivel, NivelSospecha.Tranquilo) == NivelSospecha.Sospecha),
-                    new ActionNode("Perseguir", bb =>
-                    {
+                    new Sequence("SiÚltimaPos",
+                    new Condition("¿Tiene última posición?", bb => bb.Get(ClavesBB.TieneUltimaPos, false)),
+                    new IrA("Ir a última posición", ClavesBB.UltimaPos),
+                    new MirarAlrededor("Mirar alrededor")),
 
-                    }
-                    )),*/
                     // ── Rama de PATRULLA — ejemplo de nodo hoja enchufado ───────
                     new ActionNode("Patrullar", bb =>
                     {
@@ -134,7 +131,7 @@ namespace UDIT.IA3.Guardia
         }
     }
 
-    //Creamos un nodo hoja que nos permite ir a un destino y esperar a que llegue.
+    //Creamos un nodo hoja que nos permite ir a un destino y esperar a que llegue  (Rama de SOSPECHA).
     public sealed class IrA: Node
     {
         //La clave del blackboard donde está el destino.
@@ -163,6 +160,31 @@ namespace UDIT.IA3.Guardia
             else
             {
                 return Status.Running;
+            }
+        }
+    }
+    //Creamos un nodo hoja que nos permite mirar alrededor durante un tiempo determinado (Rama de BÚSQUEDA).
+    public sealed class MirarAlrededor : Node
+    {
+        private float horaInicio;
+        private float tiempoMaximo = 3f; //Tiempo máximo para mirar alrededor
+        public MirarAlrededor(string nombre) : base(nombre)
+        {
+        }
+        protected override void OnInitialize(Blackboard bb)
+        {
+            horaInicio = bb.Tiempo; //Guarda la hora de inicio
+        }
+        protected override Status Update(Blackboard bb)
+        {
+            if (bb.Tiempo - horaInicio >= tiempoMaximo)
+            {
+                bb.Set(ClavesBB.TieneUltimaPos, false); //Borra la última posición conocida
+                return Status.Success; //Ha terminado de mirar alrededor
+            }
+            else
+            {
+                return Status.Running; //Sigue mirando alrededor
             }
         }
     }
