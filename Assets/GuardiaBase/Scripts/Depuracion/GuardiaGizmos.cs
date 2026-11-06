@@ -17,6 +17,9 @@
 
 using UnityEngine;
 using UDIT.IA3.BT;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace UDIT.IA3.Guardia
 {
@@ -84,8 +87,19 @@ namespace UDIT.IA3.Guardia
                 {
                     Gizmos.color = Color.red;
                     Gizmos.DrawLine(ojos.position, _vision.Objetivo.position);
-                }
+                }                
             }
+
+            //La última traza del guardia (Apartado A6):
+#if UNITY_EDITOR
+            if (Application.isPlaying && _agente != null)
+            {
+                //Para que salga el texto de la última traza del guardia (Apartado A6):
+                Vector3 posicion = transform.position + Vector3.up * 2.6f;
+                string texto = _agente.UltimaTraza;                
+                Handles.Label(posicion, texto);
+            }
+#endif
 
             // ── La barra de sospecha, sobre la cabeza ───────────────────────
             if (DibujarSospecha && Application.isPlaying)
