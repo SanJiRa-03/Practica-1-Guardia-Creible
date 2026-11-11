@@ -217,7 +217,7 @@ vuestros propios ojos antes de arreglarlo. Vuestro trabajo:
 | 1 · Alcance | ✅ hecho | `ComprobarVision()` |
 | 2 · Ángulo | ✅ hecho | `ComprobarVision()` |
 | 3 · Oclusión con varios puntos | ✅ hecho | `ComprobarVision()` |
-| Medidor de sospecha (3 factores, decaimiento) | ❌ **TODO** | `ActualizarSospecha()` |
+| Medidor de sospecha (3 factores, decaimiento) | ✅ hecho | `ActualizarSospecha()` |
 | Umbrales con histéresis | ✅ hecho, os lo doy | `ActualizarNivel()` |
 
 Y en la decisión:

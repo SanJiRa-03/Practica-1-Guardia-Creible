@@ -59,5 +59,13 @@ namespace UDIT.IA3.Guardia
 
         /// <summary>bool · alerta de grupo. La escribe OTRO guardia, con latencia.</summary>
         public const string AlertaDeGrupo = "alertaDeGrupo";
+
+        // ── Opcional (§7 del enunciado): Audición ─────────────
+        /// <summary>float · cuánto oye el guardia.</summary>
+        public const string VolumenRuido = "volumenRuido";
+        
+        ///<summary>Vector3 · dónde se emitió el sonido.</summary>
+        public const string PosicionRuido = "posicionRuido";
+
     }
 }
