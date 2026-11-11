@@ -11,6 +11,10 @@ namespace UDIT.IA3.Guardia
         private bool hayRuido = false;
         public float alcance = 15f;
 
+        //Para evitar que el guardia persigue constantemente al jugador:
+        [Tooltip("UmbralRuidoFuerte")]
+        public float umbralRuidoFuerte = 0.5f;
+
         //La función Percibir se encarga de determinar si el guardia puede percibir un ruido emitido en el mundo. Calcula la distancia entre el guardia y la posición del ruido, y luego aplica una atenuación basada en esa distancia para determinar el volumen percibido. Si hay un ruido y su volumen es significativo, se actualiza el Blackboard con la posición y el volumen del ruido, y se resetea la variable hayRuido para evitar que el guardia siga escuchando un ruido que ya no existe.
         public void Percibir(Blackboard bb)
         {            
@@ -27,6 +31,11 @@ namespace UDIT.IA3.Guardia
                 {
                     bb.Set(ClavesBB.VolumenRuido, volumenAtenuado);
                     bb.Set(ClavesBB.PosicionRuido, posicionRuido);
+
+                    if (volumenAtenuado > umbralRuidoFuerte)
+                    {
+                        bb.Set(ClavesBB.TieneRuidoPendiente, true);
+                    }
                 }
                 else
                 {

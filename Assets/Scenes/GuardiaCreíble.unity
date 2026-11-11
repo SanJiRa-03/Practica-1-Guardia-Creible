@@ -1957,8 +1957,16 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: -4121083210525554576, guid: c708a3b79cd542b42bbfedb17e213bc1, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 974238578668270704, guid: c708a3b79cd542b42bbfedb17e213bc1, type: 3}
+      insertIndex: 3
+      addedObject: {fileID: 1336595759}
   m_SourcePrefab: {fileID: 100100000, guid: c708a3b79cd542b42bbfedb17e213bc1, type: 3}
+--- !u!1 &1095071630 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 974238578668270704, guid: c708a3b79cd542b42bbfedb17e213bc1, type: 3}
+  m_PrefabInstance: {fileID: 1095071629}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1151612859
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2082,6 +2090,9 @@ PrefabInstance:
       addedObject: {fileID: 1151612865}
     - targetCorrespondingSourceObject: {fileID: 3862277631971027947, guid: f7a3b83d4996a5c4cba55bdeda5d9c72, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 1151612870}
+    - targetCorrespondingSourceObject: {fileID: 3862277631971027947, guid: f7a3b83d4996a5c4cba55bdeda5d9c72, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1151612864}
     - targetCorrespondingSourceObject: {fileID: 3862277631971027947, guid: f7a3b83d4996a5c4cba55bdeda5d9c72, type: 3}
       insertIndex: -1
@@ -2175,6 +2186,8 @@ MonoBehaviour:
   UmbralSospecha: 0.35
   UmbralAlerta: 0.95
   Histeresis: 0.1
+  SaltoRuido: 0.1
+  TopeSospecha: 0.6
 --- !u!114 &1151612866
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2261,6 +2274,19 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 274649b0e221539409070ebf6c18918b, type: 3}
   - {fileID: 8300000, guid: a3194b8bbc96ef84fab1f98f4b7dae3e, type: 3}
   FootstepAudioVolume: 0.5
+--- !u!114 &1151612870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1151612860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab160c487003c574e976707524ed121e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UDIT.IA3.Guardia.SensorAudicion
+  alcance: 15
 --- !u!1 &1195400273
 GameObject:
   m_ObjectHideFlags: 0
@@ -2437,6 +2463,9 @@ PrefabInstance:
       addedObject: {fileID: 1332397694}
     - targetCorrespondingSourceObject: {fileID: 3862277631971027947, guid: f7a3b83d4996a5c4cba55bdeda5d9c72, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 1332397701}
+    - targetCorrespondingSourceObject: {fileID: 3862277631971027947, guid: f7a3b83d4996a5c4cba55bdeda5d9c72, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1332397698}
     - targetCorrespondingSourceObject: {fileID: 3862277631971027947, guid: f7a3b83d4996a5c4cba55bdeda5d9c72, type: 3}
       insertIndex: -1
@@ -2527,6 +2556,8 @@ MonoBehaviour:
   UmbralSospecha: 0.35
   UmbralAlerta: 0.95
   Histeresis: 0.1
+  SaltoRuido: 0.1
+  TopeSospecha: 1
 --- !u!4 &1332397695 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1114260476483171701, guid: f7a3b83d4996a5c4cba55bdeda5d9c72, type: 3}
@@ -2606,11 +2637,37 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 274649b0e221539409070ebf6c18918b, type: 3}
   - {fileID: 8300000, guid: a3194b8bbc96ef84fab1f98f4b7dae3e, type: 3}
   FootstepAudioVolume: 0.5
+--- !u!114 &1332397701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1332397691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab160c487003c574e976707524ed121e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UDIT.IA3.Guardia.SensorAudicion
+  alcance: 15
 --- !u!4 &1336595758 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 490576248761790154, guid: c708a3b79cd542b42bbfedb17e213bc1, type: 3}
   m_PrefabInstance: {fileID: 1095071629}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1336595759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1095071630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baad761707d9b2f40a0ec1bf16f1650e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UDIT.IA3.Guardia.EmisorPasos
+  volumenPaso: 1
 --- !u!1 &1489272119
 GameObject:
   m_ObjectHideFlags: 0

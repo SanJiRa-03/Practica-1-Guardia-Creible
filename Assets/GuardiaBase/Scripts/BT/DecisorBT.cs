@@ -97,36 +97,44 @@ namespace UDIT.IA3.Guardia
                     }
                     )),
 
-                    // ── ✅ hecho· rama de SOSPECHA (investigar) ────────────────────
-                    new Monitor("SiSospecha",
+                // ── Rama de AUDICIÓN (ruido) ────────────────────────────────────
+                new Sequence("SiRuido",
+                    new Condition("¿Tiene ruido pendiente?", bb => bb.Get(ClavesBB.TieneRuidoPendiente, false)),
+                    new ActionNode("Atender ruido", bb =>
+                    {
+                        bb.Set(ClavesBB.TieneRuidoPendiente, false);
+                        return Status.Success;
+                    }
+                    ),
+                    new IrA("Ir a posición del ruido", ClavesBB.PosicionRuido)),
+
+                // ── ✅ hecho · rama de SOSPECHA (investigar) ────────────────────
+                new Monitor("SiSospecha",
                     new Condition("¿Sospecha?", bb => bb.Get(ClavesBB.Nivel, NivelSospecha.Tranquilo) == NivelSospecha.Sospecha),
                     new IrA("Ir a última posición", ClavesBB.UltimaPos)),
 
-                    // ── ✅ hecho · rama de BÚSQUEDA (última posición conocida) ──────
-                    new Sequence("SiÚltimaPos",
+                // ── ✅ hecho · rama de BÚSQUEDA (última posición conocida) ──────
+                new Sequence("SiÚltimaPos",
                     new Condition("¿Tiene última posición?", bb => bb.Get(ClavesBB.TieneUltimaPos, false)),
                     new IrA("Ir a última posición", ClavesBB.UltimaPos),
                     new MirarAlrededor("Mirar alrededor")),
 
-                    // ── Rama de PATRULLA — ejemplo de nodo hoja enchufado ───────
-                    new ActionNode("Patrullar", bb =>
+                // ── Rama de PATRULLA ────────────────────────────────────────────
+                new ActionNode("Patrullar", bb =>
+                {
+                    RutaPatrulla ruta = _agente.GetComponent<RutaPatrulla>();
+                    if (ruta == null || !ruta.TieneRuta) return Status.Failure;
+
+                    // Si ya llegué al punto anterior, pido el siguiente.
+                    if (bb.Get(ClavesBB.HaLlegado, false))
                     {
-                        RutaPatrulla ruta = _agente.GetComponent<RutaPatrulla>();
-                        if (ruta == null || !ruta.TieneRuta) return Status.Failure;
+                        bb.Set(ClavesBB.Destino, ruta.Avanzar());
+                        bb.Set(ClavesBB.TieneDestino, true);
+                    }
 
-                        // Si ya llegué al punto anterior, pido el siguiente.
-                        if (bb.Get(ClavesBB.HaLlegado, false))
-                        {
-                            bb.Set(ClavesBB.Destino, ruta.Avanzar());
-                            bb.Set(ClavesBB.TieneDestino, true);
-                        }
-
-                        // Patrullar no «termina» nunca: es una acción de fondo.
-                        // Por eso devuelve Running y no Success. Si devolviera
-                        // Success, el ActiveSelector la daría por hecha y el árbol
-                        // se quedaría sin nada que hacer.
-                        return Status.Running;
-                    })
+                    // Patrullar no «termina» nunca: es una acción de fondo.
+                    return Status.Running;
+                })
             );
         }
     }

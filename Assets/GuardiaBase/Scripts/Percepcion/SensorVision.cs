@@ -70,6 +70,12 @@ namespace UDIT.IA3.Guardia
                  "Sin esto el guardia parpadea entre estados. Es la HISTÉRESIS.")]
         [Range(0f, 0.5f)] public float Histeresis = 0.1f;
 
+        //Nueva variable para el incremento del volumen del ruido, que se usará en ActualizarSospecha() para aumentar la sospecha según el volumen del ruido emitido por el jugador.
+        [Tooltip("Incremento de sospecha por cada unidad de volumen de ruido.")]
+        public float SaltoRuido = 0.4f;
+        [Tooltip("Tope de la sospecha.")]
+        public float TopeSospecha = 0.6f;
+
         // Estado interno del sensor. Lo publica en la pizarra al final de Percibir.
         private float _sospecha;
         private NivelSospecha _nivel = NivelSospecha.Tranquilo;
@@ -106,8 +112,11 @@ namespace UDIT.IA3.Guardia
             bool visible = ComprobarVision();
             VisibleAhora = visible;
 
+            //Ahora leemos el ruido:
+            float volumenRuido = bb.Get(ClavesBB.VolumenRuido, 0f);
+
             // ── El medidor ──────────────────────────────────────────────────
-            ActualizarSospecha(visible, Time.deltaTime);
+            ActualizarSospecha(visible, Time.deltaTime, volumenRuido);
 
             // ── Publicar en la pizarra ──────────────────────────────────────
             bb.Set(ClavesBB.Visible, visible);
@@ -209,7 +218,7 @@ namespace UDIT.IA3.Guardia
         // ───────────────────────────────────────────────────────────────────
         //  EL MEDIDOR DE SOSPECHA
         // ───────────────────────────────────────────────────────────────────
-        private void ActualizarSospecha(bool visible, float dt)
+        private void ActualizarSospecha(bool visible, float dt, float volumenRuido)
         {
             // TODO · APARTADO A.2 y A.3 del enunciado
             //
@@ -254,6 +263,14 @@ namespace UDIT.IA3.Guardia
             }
 
             //_sospecha = visible ? 1f : 0f; // ← interruptor. Sustituidlo.
+
+            if(volumenRuido > 0f)
+            {
+                //Se guarda en límite el valor máximo entre la sospecha actual y el tope de sospecha definido en el inspector. Esto asegura que la sospecha no supere el límite establecido. Si el medidor ya estaba por encima del tope, el límite deja de ser el tope y pasa a ser el valor que ya tenía.
+                float limite = Mathf.Max(_sospecha, TopeSospecha);
+                //La sospecha se va a quedar con el valor mínimo entre la suma de la sospecha actual y el incremento del volumen del ruido multiplicado por el salto de ruido, y el límite establecido. Esto asegura que la sospecha no supere el límite definido.
+                _sospecha = Mathf.Min(_sospecha + volumenRuido * SaltoRuido, limite);
+            }
 
             _sospecha = Mathf.Clamp(_sospecha, 0f, 1f); //Clamp de 0 a 1.
             _nivel = ActualizarNivel(_sospecha, _nivel);

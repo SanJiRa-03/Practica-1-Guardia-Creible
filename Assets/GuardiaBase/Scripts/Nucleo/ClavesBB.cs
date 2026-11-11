@@ -67,5 +67,7 @@ namespace UDIT.IA3.Guardia
         ///<summary>Vector3 · dónde se emitió el sonido.</summary>
         public const string PosicionRuido = "posicionRuido";
 
+        ///<summary>bool · si hay un ruido oído sin investigar aún.</summary>
+        public const string TieneRuidoPendiente = "tieneRuidoPendiente";
     }
 }
