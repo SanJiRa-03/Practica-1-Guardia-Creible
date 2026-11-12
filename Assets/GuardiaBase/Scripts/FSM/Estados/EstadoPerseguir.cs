@@ -47,12 +47,12 @@ namespace UDIT.IA3.Guardia
             //    vamos a investigar el último sitio donde estaba.
             if (nivel == NivelSospecha.Sospecha)
             {
-                StateMachine.ChangeState(new EstadoInvestigar(StateMachine));
+                StateMachine.ChangeState(new EstadoBuscar(StateMachine));
                 return;
             }
 
-            // 3. Tranquilo: se acabó. Volvemos a patrullar.
-            StateMachine.ChangeState(new EstadoPatrullar(StateMachine));
+            //// 3. Tranquilo: se acabó. Volvemos a patrullar.
+            //StateMachine.ChangeState(new EstadoPatrullar(StateMachine));
         }
 
         internal override void Exit()
