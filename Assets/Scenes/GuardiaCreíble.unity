@@ -2099,6 +2099,9 @@ PrefabInstance:
       addedObject: {fileID: 1151612863}
     - targetCorrespondingSourceObject: {fileID: 3862277631971027947, guid: f7a3b83d4996a5c4cba55bdeda5d9c72, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 1151612871}
+    - targetCorrespondingSourceObject: {fileID: 3862277631971027947, guid: f7a3b83d4996a5c4cba55bdeda5d9c72, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1151612862}
     - targetCorrespondingSourceObject: {fileID: 3862277631971027947, guid: f7a3b83d4996a5c4cba55bdeda5d9c72, type: 3}
       insertIndex: -1
@@ -2287,6 +2290,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UDIT.IA3.Guardia.SensorAudicion
   alcance: 15
+  umbralRuidoFuerte: 0.5
+--- !u!114 &1151612871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1151612860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c6f7eddc2078a640af33de58ba2f4a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UDIT.IA3.Guardia.ReceptorAlertaGrupo
+  latenciaBase: 1
+  latenciaPorMetro: 0.1
 --- !u!1 &1195400273
 GameObject:
   m_ObjectHideFlags: 0
@@ -2472,6 +2490,9 @@ PrefabInstance:
       addedObject: {fileID: 1332397697}
     - targetCorrespondingSourceObject: {fileID: 3862277631971027947, guid: f7a3b83d4996a5c4cba55bdeda5d9c72, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 1332397702}
+    - targetCorrespondingSourceObject: {fileID: 3862277631971027947, guid: f7a3b83d4996a5c4cba55bdeda5d9c72, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1332397696}
     - targetCorrespondingSourceObject: {fileID: 3862277631971027947, guid: f7a3b83d4996a5c4cba55bdeda5d9c72, type: 3}
       insertIndex: -1
@@ -2650,6 +2671,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UDIT.IA3.Guardia.SensorAudicion
   alcance: 15
+  umbralRuidoFuerte: 0.5
+--- !u!114 &1332397702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1332397691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c6f7eddc2078a640af33de58ba2f4a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UDIT.IA3.Guardia.ReceptorAlertaGrupo
+  latenciaBase: 1
+  latenciaPorMetro: 0.1
 --- !u!4 &1336595758 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 490576248761790154, guid: c708a3b79cd542b42bbfedb17e213bc1, type: 3}

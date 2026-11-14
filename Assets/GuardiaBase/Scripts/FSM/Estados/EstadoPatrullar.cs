@@ -53,6 +53,12 @@ namespace UDIT.IA3.Guardia
             // capas funcionando.
             NivelSospecha nivel = Pizarra.Get(ClavesBB.Nivel, NivelSospecha.Tranquilo);
 
+            if (Pizarra.Get(ClavesBB.AlertaDeGrupo, false))
+            {
+                StateMachine.ChangeState(new EstadoInvestigar(StateMachine));
+                return;
+            }
+
             if (nivel == NivelSospecha.Alerta)
             {
                 // TODO · descomentad cuando tengáis EstadoPerseguir
@@ -77,6 +83,7 @@ namespace UDIT.IA3.Guardia
                     Pizarra.Set(ClavesBB.TieneDestino, true);
                 }
             }
+
         }
 
         internal override void Exit()

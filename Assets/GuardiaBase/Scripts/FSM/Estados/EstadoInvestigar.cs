@@ -14,22 +14,16 @@ namespace UDIT.IA3.Guardia
 
         internal override void Enter()
         {
-            _temporizador = 0f;
-            _buscando = false;
+            Pizarra.Set(ClavesBB.AlertaDeGrupo, false); // consumido
 
-            // Vamos a la última posición donde se vio al jugador.
             if (Pizarra.Get(ClavesBB.TieneUltimaPos, false))
             {
-                Vector3 ultima = Pizarra.Get(ClavesBB.UltimaPos, Vector3.zero);
-                Pizarra.Set(ClavesBB.Destino, ultima);
+                Pizarra.Set(ClavesBB.Destino, Pizarra.Get(ClavesBB.UltimaPos, Vector3.zero));
                 Pizarra.Set(ClavesBB.TieneDestino, true);
                 Pizarra.Set(ClavesBB.HaLlegado, false);
             }
             else
             {
-                // Sin posición que investigar no tiene sentido seguir aquí.
-                UnityEngine.Debug.LogWarning(
-                    "[" + Agente.name + "] investiga sin tener última posición conocida.", Agente);
                 StateMachine.ChangeState(new EstadoPatrullar(StateMachine));
             }
         }
@@ -37,6 +31,13 @@ namespace UDIT.IA3.Guardia
         internal override void Execute()
         {
             NivelSospecha nivel = Pizarra.Get(ClavesBB.Nivel, NivelSospecha.Tranquilo);
+
+            if (Pizarra.Get(ClavesBB.AlertaDeGrupo, false))
+            {
+                Pizarra.Set(ClavesBB.AlertaDeGrupo, false);
+                Pizarra.Set(ClavesBB.Destino, Pizarra.Get(ClavesBB.UltimaPos, Vector3.zero));
+                Pizarra.Set(ClavesBB.HaLlegado, false);
+            }
 
             // 1. Si lo vemos de nuevo con claridad, a perseguir.
             if (nivel == NivelSospecha.Alerta)
