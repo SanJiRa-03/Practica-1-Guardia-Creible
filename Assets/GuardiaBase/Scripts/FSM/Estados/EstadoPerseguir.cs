@@ -12,10 +12,13 @@ namespace UDIT.IA3.Guardia
         internal override void Enter()
         {
             _tiempoAviso = 0f;
+            Agente.PuntosVisitados.Clear();
 
             if (Pizarra.Get(ClavesBB.TieneUltimaPos, false))
             {
                 Vector3 objetivo = Pizarra.Get(ClavesBB.UltimaPos, Vector3.zero);
+                RutaPatrulla ruta = Agente.GetComponent<RutaPatrulla>();
+                if (ruta != null) ruta.MarcarInteres(objetivo, 1f);
                 Pizarra.Set(ClavesBB.Destino, objetivo);
                 Pizarra.Set(ClavesBB.TieneDestino, true);
                 Pizarra.Set(ClavesBB.HaLlegado, false);
@@ -50,11 +53,7 @@ namespace UDIT.IA3.Guardia
                 return;
             }
 
-            if (nivel == NivelSospecha.Sospecha)
-            {
-                StateMachine.ChangeState(new EstadoBuscar(StateMachine));
-                return;
-            }
+            StateMachine.ChangeState(new EstadoInvestigar(StateMachine));
 
             // Tranquilo: ver nota al final.
         }

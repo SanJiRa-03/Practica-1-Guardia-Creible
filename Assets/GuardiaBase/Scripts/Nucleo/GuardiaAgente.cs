@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UDIT.IA3.BT;
 
+
 namespace UDIT.IA3.Guardia
 {
     /// <summary>Qué cerebro usa este guardia. Se cambia en el inspector, en caliente.</summary>
@@ -54,6 +55,7 @@ namespace UDIT.IA3.Guardia
 
         private float _proximaDecision;
         private TipoDecisor _cerebroMontado;
+        public List<Vector3> PuntosVisitados = new List<Vector3>();
 
         private void Awake()
         {

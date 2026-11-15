@@ -6,7 +6,7 @@ namespace UDIT.IA3.Guardia
     public class EstadoBuscar : State
     {
         private const float TiempoTotalBusqueda = 0.5f;  // cuánto busca antes de rendirse
-        private const float RadioBusqueda = 6f;        // radio alrededor del último punto
+        private const float RadioBusqueda = 4f;        // radio alrededor del último punto
         private const float PausaEnCadaPunto = 1.5f;   // se queda mirando al llegar
         private const float UmbralNuevaPos = 0.5f;     // para detectar una posición distinta
 
