@@ -26,6 +26,63 @@ namespace UDIT.IA3.Guardia
         private int _indice;
         private int _paso = 1;
 
+        // ── Waypoints inteligentes: SOLO memoria. Decide EstadoPatrullar. ──
+        private float[] _ultimaVisita;
+        private float[] _interes;
+
+        [Header("Waypoints inteligentes")]
+        [Tooltip("Radio en el que un suceso afecta a los waypoints cercanos.")]
+        public float RadioInteres = 12f;
+        [Tooltip("Cuánto interés pierde un waypoint por segundo.")]
+        public float DecaimientoInteres = 0.02f;
+
+        public int NumPuntos { get { return TieneRuta ? Puntos.Length : 0; } }
+        public int IndiceActual { get { return _indice; } }
+
+        private void IniciarMemoria()
+        {
+            if (_ultimaVisita != null && _ultimaVisita.Length == Puntos.Length) return;
+            _ultimaVisita = new float[Puntos.Length];
+            _interes = new float[Puntos.Length];
+        }
+
+        public float TiempoSinVisitar(int i) { IniciarMemoria(); return Time.time - _ultimaVisita[i]; }
+        public float Interes(int i) { IniciarMemoria(); return _interes[i]; }
+        public Vector3 Posicion(int i) { return Puntos[i].position; }
+
+        /// <summary>Marca el punto actual como visitado, salta al punto i y devuelve su posición.</summary>
+        public Vector3 IrA(int i)
+        {
+            IniciarMemoria();
+            _ultimaVisita[_indice] = Time.time;
+            _interes[_indice] = 0f;          // ya lo he comprobado: se apaga el interés
+            _indice = i;
+            return PuntoActual;
+        }
+
+        /// <summary>Sube el interés de los waypoints cercanos a una posición (algo pasó ahí).</summary>
+        public void MarcarInteres(Vector3 posicion, float cantidad)
+        {
+            if (!TieneRuta) return;
+            IniciarMemoria();
+
+            for (int i = 0; i < Puntos.Length; i++)
+            {
+                if (Puntos[i] == null) continue;
+                if (Vector3.Distance(Puntos[i].position, posicion) <= RadioInteres)
+                    _interes[i] = Mathf.Min(1f, _interes[i] + cantidad);
+            }
+        }
+
+        private void Update()
+        {
+            if (!TieneRuta) return;
+            IniciarMemoria();
+
+            for (int i = 0; i < _interes.Length; i++)
+                _interes[i] = Mathf.Max(0f, _interes[i] - DecaimientoInteres * Time.deltaTime);
+        }
+
         private void Start()
         {
             if (EmpezarPorElMasCercano) _indice = IndiceMasCercano(transform.position);

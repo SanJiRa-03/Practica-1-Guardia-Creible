@@ -6,16 +6,24 @@ namespace UDIT.IA3.Guardia
     {
         public EstadoPerseguir(StateMachine machine) : base(machine) { }
 
+        private const float IntervaloAviso = 1f;
+        private float _tiempoAviso;
+
         internal override void Enter()
         {
-            // Empezamos a perseguir hacia la última posición conocida.
-            // Execute se encargará de refrescarla cada frame.
+            _tiempoAviso = 0f;
+            Agente.PuntosVisitados.Clear();
+
             if (Pizarra.Get(ClavesBB.TieneUltimaPos, false))
             {
                 Vector3 objetivo = Pizarra.Get(ClavesBB.UltimaPos, Vector3.zero);
+                RutaPatrulla ruta = Agente.GetComponent<RutaPatrulla>();
+                if (ruta != null) ruta.MarcarInteres(objetivo, 1f);
                 Pizarra.Set(ClavesBB.Destino, objetivo);
                 Pizarra.Set(ClavesBB.TieneDestino, true);
                 Pizarra.Set(ClavesBB.HaLlegado, false);
+
+                AlertaGrupo.Emitir(Agente.gameObject, objetivo); // ← aviso inicial
             }
             else
             {
@@ -23,36 +31,31 @@ namespace UDIT.IA3.Guardia
                     "[" + Agente.name + "] persigue sin tener posición del jugador.", Agente);
                 StateMachine.ChangeState(new EstadoPatrullar(StateMachine));
             }
-
-            // Aquí iría un bark tipo "¡Alto ahí!" o animación de correr.
-            // Si lo añadís, apagadlo en Exit().
         }
 
         internal override void Execute()
         {
             NivelSospecha nivel = Pizarra.Get(ClavesBB.Nivel, NivelSospecha.Tranquilo);
 
-            // 1. Seguimos en Alerta: el jugador está a la vista (o se sabe dónde está).
-            //    Actualizamos el destino cada frame para que el guardia lo siga.
             if (nivel == NivelSospecha.Alerta)
             {
                 Vector3 objetivo = Pizarra.Get(ClavesBB.UltimaPos, Vector3.zero);
                 Pizarra.Set(ClavesBB.Destino, objetivo);
                 Pizarra.Set(ClavesBB.TieneDestino, true);
                 Pizarra.Set(ClavesBB.HaLlegado, false);
+
+                _tiempoAviso += Time.deltaTime;
+                if (_tiempoAviso >= IntervaloAviso)
+                {
+                    _tiempoAviso = 0f;
+                    AlertaGrupo.Emitir(Agente.gameObject, objetivo); // ← aviso periódico
+                }
                 return;
             }
 
-            // 2. Hemos perdido al jugador de vista pero aún queda sospecha:
-            //    vamos a investigar el último sitio donde estaba.
-            if (nivel == NivelSospecha.Sospecha)
-            {
-                StateMachine.ChangeState(new EstadoInvestigar(StateMachine));
-                return;
-            }
+            StateMachine.ChangeState(new EstadoInvestigar(StateMachine));
 
-            // 3. Tranquilo: se acabó. Volvemos a patrullar.
-            StateMachine.ChangeState(new EstadoPatrullar(StateMachine));
+            // Tranquilo: ver nota al final.
         }
 
         internal override void Exit()

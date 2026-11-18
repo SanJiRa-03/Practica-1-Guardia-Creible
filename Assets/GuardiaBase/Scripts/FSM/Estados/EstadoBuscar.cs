@@ -5,8 +5,8 @@ namespace UDIT.IA3.Guardia
 {
     public class EstadoBuscar : State
     {
-        private const float TiempoTotalBusqueda = 3f;  // cuánto busca antes de rendirse
-        private const float RadioBusqueda = 6f;        // radio alrededor del último punto
+        private const float TiempoTotalBusqueda = 0.5f;  // cuánto busca antes de rendirse
+        private const float RadioBusqueda = 4f;        // radio alrededor del último punto
         private const float PausaEnCadaPunto = 1.5f;   // se queda mirando al llegar
         private const float UmbralNuevaPos = 0.5f;     // para detectar una posición distinta
 
@@ -39,6 +39,12 @@ namespace UDIT.IA3.Guardia
         internal override void Execute()
         {
             NivelSospecha nivel = Pizarra.Get(ClavesBB.Nivel, NivelSospecha.Tranquilo);
+
+            if (Pizarra.Get(ClavesBB.AlertaDeGrupo, false))
+            {
+                StateMachine.ChangeState(new EstadoInvestigar(StateMachine));
+                return;
+            }
 
             // 1. Lo hemos vuelto a ver: a perseguir.
             if (nivel == NivelSospecha.Alerta)
@@ -87,6 +93,7 @@ namespace UDIT.IA3.Guardia
                     IrAPuntoAleatorio();
                 }
             }
+
         }
 
         internal override void Exit()
