@@ -2147,6 +2147,7 @@ MonoBehaviour:
   Cerebro: 1
   FrecuenciaDecision: 10
   MostrarTraza: 1
+  PuntosVisitados: []
 --- !u!114 &1151612864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2189,7 +2190,7 @@ MonoBehaviour:
   UmbralSospecha: 0.35
   UmbralAlerta: 0.95
   Histeresis: 0.1
-  SaltoRuido: 0.1
+  SaltoRuido: 0.4
   TopeSospecha: 0.6
 --- !u!114 &1151612866
 MonoBehaviour:
@@ -2224,6 +2225,8 @@ MonoBehaviour:
   - {fileID: 1195400274}
   PingPong: 0
   EmpezarPorElMasCercano: 0
+  RadioInteres: 12
+  DecaimientoInteres: 0.02
 --- !u!195 &1151612867
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -2548,6 +2551,8 @@ MonoBehaviour:
   - {fileID: 1644990885}
   PingPong: 0
   EmpezarPorElMasCercano: 0
+  RadioInteres: 12
+  DecaimientoInteres: 0.02
 --- !u!114 &1332397694
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2577,8 +2582,8 @@ MonoBehaviour:
   UmbralSospecha: 0.35
   UmbralAlerta: 0.95
   Histeresis: 0.1
-  SaltoRuido: 0.1
-  TopeSospecha: 1
+  SaltoRuido: 0.4
+  TopeSospecha: 0.6
 --- !u!4 &1332397695 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1114260476483171701, guid: f7a3b83d4996a5c4cba55bdeda5d9c72, type: 3}
@@ -2614,6 +2619,7 @@ MonoBehaviour:
   Cerebro: 0
   FrecuenciaDecision: 10
   MostrarTraza: 1
+  PuntosVisitados: []
 --- !u!114 &1332397698
 MonoBehaviour:
   m_ObjectHideFlags: 0
